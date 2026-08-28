@@ -162,6 +162,9 @@ def _probe_request(method: str, url: str, api_key: str, payload: dict | None = N
             headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
             json=payload,
             timeout=PROBE_TIMEOUT,
+            # 不走系统代理：Windows 系统代理可能指向未运行的本地端口（如 127.0.0.1:7892），
+            # 会把直连国内模型（如 DeepSeek）的请求也劫持过去导致连接失败。
+            proxies={"http": None, "https": None},
         )
     except requests.Timeout:
         raise HTTPException(status_code=504, detail="连接超时，请检查 API 地址是否可达")

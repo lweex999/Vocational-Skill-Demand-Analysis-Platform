@@ -76,6 +76,9 @@ def _chat_completion(cfg: UserAIConfig, messages: list[dict]) -> dict:
                 "max_tokens": 1500,
             },
             timeout=REQUEST_TIMEOUT,
+            # 不走系统代理：Windows 系统代理可能指向未运行的本地端口（如 127.0.0.1:7892），
+            # 会把直连国内模型（如 DeepSeek）的请求也劫持过去导致连接失败。
+            proxies={"http": None, "https": None},
         )
     except requests.Timeout:
         raise HTTPException(status_code=504, detail="调用 AI 接口超时，请稍后重试或检查 API 地址")
